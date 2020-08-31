@@ -1,7 +1,10 @@
-###
-Node Status Detecting Program for node status reporting.
+# Detecting Program
 
-# Build current arch docker image:
+This is a program for node status reporting.
+
+## Build
+
+### 1. Build current arch docker image:
 
 
 ```
@@ -13,7 +16,7 @@ make container
 make push
 ```
 
-# Build all arch docker image:
+### 2.Build all arch docker image:
 
 
 ```
@@ -23,11 +26,12 @@ make all
 make all-push
 ```
 
-# Deploy to kubernetes
+## Deploy
 
 
 ```
-cd detect
-vi values.yaml #edit the image and tag
+cd charts/detect
+#edit the image and tag
+vi values.yaml
 helm install --name detect .
 ```
