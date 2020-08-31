@@ -1,0 +1,19 @@
+<div class="node-list-container">
+  <clr-datagrid (clrDgRefresh)="retrieve()" [clrDgLoading]="isLoading">
+    <clr-dg-column>节点名称</clr-dg-column>
+    <clr-dg-column>节点地址</clr-dg-column>
+    <clr-dg-column>创建时间</clr-dg-column>
+    <clr-dg-row *ngFor="let node of k8sNodes.items">
+      <clr-dg-cell>{{node.metadata.name}}</clr-dg-cell>
+      <clr-dg-cell>{{node.status.addresses[0].address}}</clr-dg-cell>
+      <clr-dg-cell>{{node.metadata.creationTimestamp}}</clr-dg-cell>
+    </clr-dg-row>
+    <clr-dg-footer>
+      {{firstItem}} -{{lastItem}} of {{k8sNodes.items.length}} items
+      <clr-dg-pagination [clrDgTotalItems]="k8sNodes.items.length"
+                         [(clrDgPage)]="pageIndex"
+                         [clrDgPageSize]="pageSize">
+      </clr-dg-pagination>
+    </clr-dg-footer>
+  </clr-datagrid>
+</div>
