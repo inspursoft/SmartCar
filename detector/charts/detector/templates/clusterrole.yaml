@@ -6,3 +6,6 @@ rules:
   - apiGroups: [""]
     resources: ["nodes"]
     verbs: ["get"]
+  - apiGroups: ["devices.kubeedge.io"]
+    resources: ["devices"]
+    verbs: ["list", "get"]
