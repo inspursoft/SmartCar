@@ -1,0 +1,8 @@
+div.node-list-container {
+  display: flex;
+  padding: 10px;
+}
+
+div.node-list-container clr-datagrid {
+  width: 100%;
+}

@@ -1,0 +1,91 @@
+<h3>&nbsp;&nbsp;&nbsp;&nbsp;设备列表：</h3>
+<div class="node-list-container">
+  <clr-datagrid (clrDgRefresh)="getDevice()"
+                [clrDgLoading]="isLoading">
+    <clr-dg-column>设备节点</clr-dg-column>
+    <clr-dg-column>设备模型</clr-dg-column>
+    <clr-dg-column>设备名称</clr-dg-column>
+    <clr-dg-column>创建时间</clr-dg-column>
+    <clr-dg-row *ngFor="let device of deviceList.items">
+      <clr-dg-cell>{{device.spec.nodeSelector.nodeSelectorTerms[0].matchExpressions[0].values[0] ?
+        device.spec.nodeSelector.nodeSelectorTerms[0].matchExpressions[0].values[0] : 'Null'}}</clr-dg-cell>
+      <clr-dg-cell (click)="showModel(device.spec.deviceModelRef.name)">
+        <clr-icon shape="list"></clr-icon>
+        {{device.spec.deviceModelRef.name ? device.spec.deviceModelRef.name : 'Null'}}
+      </clr-dg-cell>
+      <clr-dg-cell (click)="showDevice(device)">
+        <clr-icon shape="list"></clr-icon> {{device.metadata.name ? device.metadata.name : 'Null'}}
+      </clr-dg-cell>
+      <clr-dg-cell>{{device.metadata.creationTimestamp ? device.metadata.creationTimestamp : 'Null'}}</clr-dg-cell>
+    </clr-dg-row>
+    <clr-dg-footer>
+      {{firstItem}} -{{lastItem}} of {{deviceList.items.length}} items
+      <clr-dg-pagination [clrDgTotalItems]="deviceList.items.length"
+                         [(clrDgPage)]="pageIndex"
+                         [clrDgPageSize]="pageSize">
+      </clr-dg-pagination>
+    </clr-dg-footer>
+  </clr-datagrid>
+</div>
+
+<clr-modal [(clrModalOpen)]="isShowModel"
+           *ngIf="isShowModel">
+  <h3 class="modal-title">{{model.name}}</h3>
+  <div class="modal-body">
+    <div>apiVersion: {{model.apiVersion}}</div>
+    <div>kind: {{model.kind}}</div>
+    <div>spec: </div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;properties: [</div>
+    <div *ngFor="let property of model.spec.properties">
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{property | json}}
+    </div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;]</div>
+  </div>
+  <div class="modal-footer">
+    <button type="button"
+            class="btn btn-primary"
+            (click)="isShowModel = false">OK</button>
+  </div>
+</clr-modal>
+
+<clr-modal [(clrModalOpen)]="isShowDetail"
+           [clrModalSize]="'xl'"
+           [clrModalClosable]="false"
+           *ngIf="isShowDetail">
+  <h3 class="modal-title">{{device.metadata.name}}</h3>
+  <div class="modal-body clr-row">
+    <div class="clr-col"
+         *ngFor="let twin of deviceDetail.twins; let j=index">
+      <span>参数名: {{twin}}</span>
+      <clr-datagrid [clrDgLoading]="isDeviceLoading">
+        <clr-dg-column style="max-width: 2.5rem; min-width: 2.5rem;">序号</clr-dg-column>
+        <clr-dg-column>时间戳</clr-dg-column>
+        <clr-dg-column>期望值</clr-dg-column>
+        <clr-dg-column>实际值</clr-dg-column>
+        <clr-dg-row *ngFor="let deviceValue of deviceDetail.values.get(twin); let i=index">
+          <clr-dg-cell style="max-width: 2.5rem; min-width: 2.5rem;">{{i+1}}</clr-dg-cell>
+          <clr-dg-cell> {{deviceValue.timestamp | date:'MM-dd HH:mm:ss'}} </clr-dg-cell>
+          <clr-dg-cell>{{deviceValue.desired}}</clr-dg-cell>
+          <clr-dg-cell>{{deviceValue.reported}}</clr-dg-cell>
+        </clr-dg-row>
+      </clr-datagrid>
+      <div *ngIf="isPropertiesEditable.get(twin)">
+        <label for="">期望值:</label>
+        <input type="text"
+               placeholder="{{twin}}"
+               [(ngModel)]="exceptedValues[j]"
+               class="clr-input"
+               style="margin-right: 1rem;" />
+        <button class="btn btn-sm"
+                [disabled]="!isEnableUpdate"
+                (click)="updateExcepted(twin, j)">更新</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button"
+            class="btn btn-primary"
+            (click)="clearSetInterval()">关闭</button>
+  </div>
+</clr-modal>

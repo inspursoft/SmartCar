@@ -243,3 +243,187 @@ export class K8sNodes extends HttpBase {
     this.items = new Array<Node>();
   }
 }
+
+// ############################### Device #####################################
+
+export class DeviceMetadata extends HttpBase {
+  @HttpBind('creationTimestamp') creationTimestamp = '';
+  @HttpBind('generation') generation = 0;
+  @HttpBind('labels') labels = '';
+  @HttpBind('name') name = '';
+  @HttpBind('namespace') namespace = '';
+  @HttpBind('resourceVersion') resourceVersion = '';
+  @HttpBind('selfLink') selfLink = '';
+  @HttpBind('uid') uid = '';
+}
+
+export class DeviceModelRef extends HttpBase {
+  @HttpBind('name') name = '';
+}
+
+export class MatchExpression extends HttpBase {
+  @HttpBind('key') key = '';
+  @HttpBind('operator') operator = '';
+  @HttpBind('values') values = [];
+  // @HttpBindStringArray('values', Array<string>) values: Array<string>;
+}
+
+export class NodeSelectorTerm extends HttpBase {
+  @HttpBindArray('matchExpressions', MatchExpression) matchExpressions: Array<MatchExpression>;
+
+  protected prepareInit(): void {
+    this.matchExpressions = new Array<MatchExpression>();
+  }
+}
+
+export class NodeSelector extends HttpBase {
+  @HttpBindArray('nodeSelectorTerms', NodeSelectorTerm) nodeSelectorTerms: Array<NodeSelectorTerm>;
+
+  protected prepareInit(): void {
+    this.nodeSelectorTerms = new Array<NodeSelectorTerm>();
+  }
+}
+
+export class Spec extends HttpBase {
+  @HttpBindObject('deviceModelRef', DeviceModelRef) deviceModelRef: DeviceModelRef;
+  @HttpBindObject('nodeSelector', NodeSelector) nodeSelector: NodeSelector;
+}
+
+export class TwinValueMetadata extends HttpBase {
+  @HttpBind('type') type = '';
+  @HttpBind('timestamp') timestamp = '';
+
+  protected prepareInit(): void {
+    this.timestamp = '0';
+  }
+}
+
+export class TwinValue extends HttpBase {
+  @HttpBind('value') value = '';
+  @HttpBindObject('metadata', TwinValueMetadata) metadata: TwinValueMetadata;
+}
+
+export class Twin extends HttpBase {
+  @HttpBindObject('desired', TwinValue) desired: TwinValue;
+  @HttpBind('propertyName') propertyName = '';
+  @HttpBindObject('reported', TwinValue) reported: TwinValue;
+}
+
+export class Twins extends HttpBase {
+  @HttpBindArray('twins', Twin) twins: Array<Twin>;
+
+  protected prepareInit(): void {
+    this.twins = new Array<Twin>();
+  }
+}
+
+export class Device extends HttpBase {
+  @HttpBind('apiVersion') apiVersion = '';
+  @HttpBind('kind') kind = '';
+  @HttpBindObject('metadata', DeviceMetadata) metadata: DeviceMetadata;
+  @HttpBindObject('spec', Spec) spec: Spec;
+  @HttpBindObject('status', Twins) status: Twins;
+
+  updateExpectedValue(propertyName: string, value: string): void {
+    for (let index = 0; index < this.status.twins.length; index++) {
+      if (this.status.twins[index].propertyName === propertyName) {
+        this.status.twins[index].desired.value = value;
+        break;
+      }
+    }
+  }
+}
+
+export class DeviceList extends HttpBase {
+  @HttpBind('apiVersion') apiVersion = '';
+  @HttpBindArray('items', Device) items: Array<Device>;
+  @HttpBind('kind') kind = '';
+
+  protected prepareInit(): void {
+    this.items = new Array<Device>();
+  }
+}
+
+export class DeviceValue {
+  timestamp = '';
+  desired = '';
+  reported = '';
+
+  constructor(timestamp: string, desired: string, reported: string) {
+    this.timestamp = timestamp ? timestamp : '/';
+    this.desired = desired ? desired : '/';
+    this.reported = reported ? reported : '/';
+  }
+}
+
+export class DeviceDetail {
+  twins: Array<string>;
+  values: Map<string, Array<DeviceValue>>;
+
+  constructor(device: Device) {
+    this.twins = new Array<string>();
+    this.values = new Map<string, Array<DeviceValue>>();
+    device.status.twins.forEach(twin => {
+      this.twins.push(twin.propertyName);
+      const twinValue = new Array<DeviceValue>();
+      const timestamp = typeof (twin.reported) !== 'undefined' ? twin.reported.metadata.timestamp : '0';
+      const desired = twin.desired.value ? twin.desired.value : '/';
+      const reported = typeof (twin.reported) !== 'undefined' ? twin.reported.value : '/';
+      twinValue.push(
+        new DeviceValue(timestamp, desired, reported));
+      this.values.set(twin.propertyName, twinValue);
+    });
+  }
+
+  pushValues(device: Device): void {
+    device.status.twins.forEach(twin => {
+      const list = this.values.get(twin.propertyName);
+      const timestamp = typeof (twin.reported) !== 'undefined' ? twin.reported.metadata.timestamp : '0';
+      const desired = twin.desired.value ? twin.desired.value : '/';
+      const reported = typeof (twin.reported) !== 'undefined' ? twin.reported.value : '/';
+      list.push(
+        new DeviceValue(timestamp, desired, reported));
+      if (list.length > 20) {
+        list.shift();
+      }
+      this.values.set(twin.propertyName, list);
+    });
+  }
+}
+
+// ############################## DeviceModel ################################
+
+export class ModelPropertyTypeValue extends HttpBase {
+  @HttpBind('accessMode') accessMode = '';
+  @HttpBind('defaultValue') defaultValue = '';
+}
+
+export class ModelPropertyType extends HttpBase {
+  @HttpBindObject('string', ModelPropertyTypeValue) string: ModelPropertyTypeValue;
+  @HttpBindObject('int', ModelPropertyTypeValue) int: ModelPropertyTypeValue;
+}
+
+export class ModelProperty extends HttpBase {
+  @HttpBind('description') properties = '';
+  @HttpBind('name') name = '';
+  @HttpBindObject('type', ModelPropertyType) type: ModelPropertyType;
+}
+
+export class ModelSpec extends HttpBase {
+  @HttpBind('properties') properties: Array<ModelProperty>;
+
+  protected prepareInit(): void {
+    this.properties = new Array<ModelProperty>();
+  }
+}
+
+export class DeviceModel extends HttpBase {
+  @HttpBind('apiVersion') apiVersion = '';
+  @HttpBind('kind') kind = '';
+  @HttpBindObject('spec', ModelSpec) spec: ModelSpec;
+  name = '';
+
+  setName(name: string): void {
+    this.name = name;
+  }
+}

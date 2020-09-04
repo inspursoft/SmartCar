@@ -1,6 +1,10 @@
 {
     "/api/v1/*": {
-        "target": "https://10.110.25.227:5280",
+        "target": "https://192.168.137.115:6443",
+        "secure": false
+    },
+    "/apis/*": {
+        "target": "https://192.168.137.115:6443",
         "secure": false
     }
 }

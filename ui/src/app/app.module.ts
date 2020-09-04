@@ -20,6 +20,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { NodeListComponent } from './node-list/node-list.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { DashboardNewComponent } from './dashboard-new/dashboard-new.component';
+import { DeviceComponent } from './device/device.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { DashboardNewComponent } from './dashboard-new/dashboard-new.component';
     NodeListComponent,
     DashboardComponent,
     DashboardNewComponent,
+    DeviceComponent,
   ],
   imports: [
     BrowserModule,
