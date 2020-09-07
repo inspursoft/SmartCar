@@ -1,0 +1,19 @@
+apiVersion: devices.kubeedge.io/v1alpha1
+kind: DeviceModel
+metadata:
+  name: humidity-model
+  namespace: default
+spec:
+  properties:
+    - name: humidity-status
+      description: Humidity collected from the edge device
+      type:
+        string:
+          accessMode: ReadOnly
+          defaultValue: ''
+    - name: humidity-switch
+      description: Humidity sensor switch ON OFF
+      type:
+        string:
+          accessMode: ReadWrite
+          defaultValue: 'ON'
