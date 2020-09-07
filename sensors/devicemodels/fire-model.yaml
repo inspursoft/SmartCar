@@ -1,0 +1,19 @@
+apiVersion: devices.kubeedge.io/v1alpha1
+kind: DeviceModel
+metadata:
+  name: fire-model
+  namespace: default
+spec:
+  properties:
+    - name: fire-status
+      description: Fire warning from the edge device, 1 warning
+      type:
+        int:
+          accessMode: ReadOnly
+          defaultValue: 0
+    - name: fire-switch
+      description: Fire sensor switch ON OFF
+      type:
+        string:
+          accessMode: ReadWrite
+          defaultValue: 'ON'
