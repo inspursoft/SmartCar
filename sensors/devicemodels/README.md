@@ -4,5 +4,5 @@ There are several sensors on the inspection car, use the kubernetes device model
 Deploy the device model on k8s:
 
 ```
-kubectl create -f warningled-model.yaml
+#kubectl create -f warningled-model.yaml
 ```
