@@ -1,5 +1,6 @@
 # SmartCar Sensors
-There are several sensors on the inspection car, use the kubernetes device model to define the data struct of each type of sensors
+There are several sensors on the inspection car. In the project, use the kubernetes device model to define the data struct of each type of sensors. 
+Then deploy a device instance for each sensor and get the sensor data by kubernetes
 
 Deploy the device model on k8s:
 
