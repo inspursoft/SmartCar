@@ -8,7 +8,7 @@ Deploy the device model on k8s:
 #kubectl create -f warningled-model.yaml
 ```
 
-Check the device model
+Check the device model:
 ```
 [root@192 crds]# kubectl get devicemodel warningled-model -o yaml
 apiVersion: devices.kubeedge.io/v1alpha1
