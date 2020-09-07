@@ -1,0 +1,13 @@
+apiVersion: devices.kubeedge.io/v1alpha1
+kind: DeviceModel
+metadata:
+ name: warningled-model
+ namespace: default
+spec:
+ properties:
+  - name: status
+    description: Warning led status RUNNING (Green) WARNING (Red) OFF (Default)
+    type:
+     string:
+      accessMode: ReadWrite
+      defaultValue: 'OFF'
