@@ -1,0 +1,15 @@
+[Unit]
+Description=monitor
+After=bluetooth.service bt-pan.service
+
+[Service]
+Type=simple
+PIDFile=/run/monitor.pid
+ExecStart=/opt/shell/monitor.sh 
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=true
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

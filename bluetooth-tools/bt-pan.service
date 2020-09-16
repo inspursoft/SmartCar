@@ -1,0 +1,15 @@
+[Unit]
+Description=Use bt-pan to connect bluetooth network
+After=bluetooth.service
+
+[Service]
+Type=forking
+#EnvironmentFile=/etc/systemd/test.conf
+ExecStart=/usr/local/bin/bt-pan --debug --system client B8:27:EB:EA:C4:A2
+ExecStop=/usr/local/bin/bt-pan client B8:27:EB:EA:C4:A2 -d
+RemainAfterExit=yes
+Restart=on-failure
+RestartSec=30s
+
+[Install]
+WantedBy=multi-user.target
