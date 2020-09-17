@@ -11,21 +11,21 @@ export interface IBindType {
 
 export function HttpBind(serverPropertyName: string): any {
   return (target: HttpBase, propertyName: string) => {
-    const resValue: IBindType = {serverPropertyTypeName: 'normal', serverPropertyName};
+    const resValue: IBindType = { serverPropertyTypeName: 'normal', serverPropertyName };
     Reflect.defineMetadata(propertyName, resValue, target);
   };
 }
 
 export function HttpBindObject(serverPropertyName: string, itemType: Type<HttpBase>): any {
   return (target: HttpBase, propertyName: string) => {
-    const resValue: IBindType = {serverPropertyTypeName: 'object', serverPropertyName, itemType};
+    const resValue: IBindType = { serverPropertyTypeName: 'object', serverPropertyName, itemType };
     Reflect.defineMetadata(propertyName, resValue, target);
   };
 }
 
 export function HttpBindArray(serverPropertyName: string, itemType: Type<HttpBase>): any {
   return (target: HttpBase, propertyName: string) => {
-    const resValue: IBindType = {serverPropertyTypeName: 'array', serverPropertyName, itemType};
+    const resValue: IBindType = { serverPropertyTypeName: 'array', serverPropertyName, itemType };
     Reflect.defineMetadata(propertyName, resValue, target);
   };
 }
@@ -73,8 +73,10 @@ export abstract class HttpBase {
         reqArray.forEach(reqItem => reqPropertyValue.push(reqItem.getPostBody()));
         Reflect.set(postBody, metadataValue.serverPropertyName, reqPropertyValue);
       } else if (metadataValue.serverPropertyTypeName === 'object') {
-        const reqObject = property as HttpBase;
-        Reflect.set(postBody, metadataValue.serverPropertyName, reqObject.getPostBody());
+        if (typeof property !== 'undefined') {
+          const reqObject = property as HttpBase;
+          Reflect.set(postBody, metadataValue.serverPropertyName, reqObject.getPostBody());
+        }
       } else if (metadataValue.serverPropertyTypeName === 'boolean') {
         const booleanValue = property ? metadataValue.booleanTrueValue : metadataValue.booleanFalseValue;
         Reflect.set(postBody, metadataValue.serverPropertyName, booleanValue);
@@ -151,10 +153,10 @@ export abstract class ResponsePaginationBase<T extends HttpBase> {
     const resList = this.getObject(this.ListKeyName());
     if (Array.isArray(resList)) {
       (resList as Array<object>).forEach(response => {
-          const item = this.CreateOneItem(response);
-          item.initFromRes();
-          this.list.push(item);
-        }
+        const item = this.CreateOneItem(response);
+        item.initFromRes();
+        this.list.push(item);
+      }
       );
     }
   }
@@ -165,9 +167,9 @@ export abstract class ResponsePaginationBase<T extends HttpBase> {
     return {
       next(): any {
         if (index < self.list.length) {
-          return {value: self.list[index++], done: false};
+          return { value: self.list[index++], done: false };
         } else {
-          return {value: undefined, done: true};
+          return { value: undefined, done: true };
         }
       }
     };

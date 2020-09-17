@@ -1,0 +1,18 @@
+FROM arm32v6/golang:1.12-alpine3.10
+
+RUN echo http://mirrors.ustc.edu.cn/alpine/v3.10/main > /etc/apk/repositories; \
+    echo http://mirrors.ustc.edu.cn/alpine/v3.10/community >> /etc/apk/repositories; \
+    apk add gcc libc-dev --no-cache
+
+COPY . $GOPATH/src/temperature-and-humidity
+
+ENV GO111MODULE=off DHT11PIN=11 DEVICE_NAME=temperature-and-humidity
+
+WORKDIR $GOPATH/src/temperature-and-humidity/src
+
+RUN go build -v -o /go/bin/temperature-and-humidity && \
+    chmod u+x /go/bin/temperature-and-humidity
+
+WORKDIR /go/bin/
+
+CMD ["temperature-and-humidity"]

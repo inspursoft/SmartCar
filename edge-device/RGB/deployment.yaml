@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rgb-light-mapper
+  labels:
+    app: rgb-light
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rgb-light
+  template:
+    metadata:
+      labels:
+        app: rgb-light
+    spec:
+      hostNetwork: true
+      nodeSelector:
+        kubernetes.io/hostname: "edge-zero02"
+      containers:
+        - name: rgb-light
+          image: edge-rgb-light:v1
+          env:              # NOTE: Pwm is possible only for pins 12, 13, 18, 19. https://github.com/stianeikeland/go-rpio/blob/v4.2.0/rpio.go#L238
+            - name: RPIN
+              value: "12"
+            - name: GPIN
+              value: "13"
+            - name: BPIN
+              value: "19"
+            - name: DEVICE_NAME
+              value: "rgb-light-device"   # device name in crds/device.yaml
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: config-volume
+              mountPath: /opt/kubeedge/
+      volumes:
+        - name: config-volume
+          configMap:
+            name: device-profile-config-edge-zero02     # device-profile-config-<edge_node_name>

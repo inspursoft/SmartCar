@@ -1,0 +1,13 @@
+[Unit]
+Description=Use bt-pan to connect bluetooth network
+After=bluetooth.service
+
+[Service]
+Type=forking
+Environment="SERVER_MAC=B8:27:EB:EA:C4:A2"
+ExecStart=/usr/local/bin/bt-pan --debug --system client ${SERVER_MAC}
+ExecStop=/usr/local/bin/bt-pan --debug client ${SERVER_MAC} -d
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
